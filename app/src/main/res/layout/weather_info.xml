@@ -154,7 +154,7 @@
 
                         <!--PM2.5数值-->
                         <TextView
-                            android:id="@+id/pm_date"
+                            android:id="@+id/pm_data"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:lines="1"
@@ -262,7 +262,7 @@
                     android:layout_marginLeft="5.0dp"
                     android:layout_toRightOf="@+id/weather_img"
                     android:lines="1"
-                    android:text="当前温度：5°C"
+                    android:text="当前温度：15°C"
                     android:textColor="@android:color/white"
                     android:textSize="20.0sp"/>
             </RelativeLayout>

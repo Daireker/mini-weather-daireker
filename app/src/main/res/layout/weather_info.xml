@@ -104,13 +104,26 @@
                 android:textColor="@android:color/white"
                 android:textSize="15.0sp"/>
 
+            <!--当前温度-->
+            <TextView
+                android:id="@+id/temperature_now"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@+id/time"
+                android:layout_marginLeft="15.0dp"
+                android:lines="1"
+                android:text="当前温度"
+                android:textColor="@android:color/white"
+                android:textSize="15.0sp"/>
+
             <!--湿度信息-->
             <TextView
                 android:id="@+id/humidity"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
-                android:layout_below="@+id/time"
+                android:layout_below="@+id/temperature_now"
                 android:layout_marginLeft="15.0dp"
                 android:lines="1"
                 android:text="湿度：57%"
@@ -253,18 +266,6 @@
                     android:textColor="@android:color/white"
                     android:textSize="20.0sp"/>
 
-                <!--当前温度-->
-                <TextView
-                    android:id="@+id/temperature_now"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@+id/wind"
-                    android:layout_marginLeft="5.0dp"
-                    android:layout_toRightOf="@+id/weather_img"
-                    android:lines="1"
-                    android:text="当前温度：15°C"
-                    android:textColor="@android:color/white"
-                    android:textSize="20.0sp"/>
             </RelativeLayout>
 
         </RelativeLayout>

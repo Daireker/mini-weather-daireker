@@ -1,4 +1,4 @@
-package com.example.daireker.miniweather;
+package com.example.daireker.util;
 
 import android.app.admin.ConnectEvent;
 import android.content.Context;

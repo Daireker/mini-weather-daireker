@@ -109,12 +109,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View view){
         switch (view.getId()){
             case R.id.title_city_manager:
-                Intent intent = new Intent(this,SelectCity.class);
+                Intent i = new Intent(this,SelectCity.class);
                 //startActivity(intent);
-                startActivityForResult(intent,1);
+                startActivityForResult(i,1);
                 break;
             case R.id.title_update_btn:
-                SharedPreferences sharedPreferences =getSharedPreferences("config",MODE_PRIVATE);
+                SharedPreferences sharedPreferences = getSharedPreferences("config",MODE_PRIVATE);
                 String cityCode = sharedPreferences.getString("main_city_code","101010100");
                 Log.d("myWeather",cityCode);
 
@@ -144,7 +144,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         pmDataTv.setText(todayWeather.getPm25());
         pmQualityTv.setText(todayWeather.getQuality());
         weekTv.setText(todayWeather.getDate());
-        temperatureTv.setText(todayWeather.getHigh()+"~"+todayWeather.getLow());
+        temperatureTv.setText(todayWeather.getLow()+"~"+todayWeather.getHigh());
         nowTemperatureTv.setText("当前温度:"+todayWeather.getWendu()+"℃");
         climateTv.setText(todayWeather.getType());
         windTv.setText("风力:"+todayWeather.getFengli());
@@ -252,7 +252,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         //super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode == 1 && requestCode == RESULT_OK){
+        if(requestCode == 1 && resultCode == RESULT_OK){
             String newCityCode = data.getStringExtra("cityCode");
             Log.d("myWeather","选择的城市代码为" + newCityCode);
 
@@ -260,6 +260,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             if(NetUtil.getNetworkState(this) != NetUtil.NETWORN_NONE){
                 Log.d("myWeather","网络OK");
                 Toast.makeText(MainActivity.this,"网络OK！",Toast.LENGTH_LONG).show();
+                queryWeatherCode(newCityCode);
             }else{
                 Log.d("myWeather","网络挂了");
                 Toast.makeText(MainActivity.this,"网络挂了！",Toast.LENGTH_LONG).show();

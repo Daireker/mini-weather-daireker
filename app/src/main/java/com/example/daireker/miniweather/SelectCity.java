@@ -28,9 +28,9 @@ public class SelectCity extends AppCompatActivity implements View.OnClickListene
     public void onClick(View view){
         switch (view.getId()){
             case R.id.title_back:
-                Intent intent = new Intent();
-                intent.putExtra("cityCode","101160101");
-                setResult(RESULT_OK,intent);
+                Intent i = new Intent();
+                i.putExtra("cityCode","101190101");
+                setResult(RESULT_OK,i);
                 finish();
                 break;
             default:

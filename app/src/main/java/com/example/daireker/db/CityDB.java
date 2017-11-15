@@ -14,6 +14,7 @@ import java.util.List;
  * Created by daireker on 2017/9/28.
  */
 
+//创建CityDB操作类
 public class CityDB {
     public static final String CITY_DB_NAME = "city.db";
     private static final String CITY_TABLE_NAME = "city";

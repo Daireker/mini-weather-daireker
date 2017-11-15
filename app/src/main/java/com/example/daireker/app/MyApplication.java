@@ -31,7 +31,7 @@ public class MyApplication extends Application{
         Log.d(TAG,"MyApplication->OnCreate");
 
         myApplication = this;
-        myCityDB = openCityDB();
+        myCityDB = openCityDB();   //打开数据库
         initCityList();
     }
 
@@ -39,6 +39,7 @@ public class MyApplication extends Application{
         return myApplication;
     }
 
+    //初始化城市信息列表
     private void initCityList(){
         myCityList = new ArrayList<City>();
         new Thread(new Runnable() {
@@ -49,6 +50,7 @@ public class MyApplication extends Application{
         }).start();
     }
 
+    //初始化城市信息列表
     private boolean prepareCityList(){
         myCityList = myCityDB.getAllCity();
         int i = 0;
@@ -66,6 +68,7 @@ public class MyApplication extends Application{
         return myCityList;
     }
 
+    //创建打开数据库的方法
     private CityDB openCityDB(){
         String path = "/data"
                 + Environment.getDataDirectory().getAbsolutePath()

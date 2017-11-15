@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -32,15 +33,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private static final int UPDATE_TODAY_WEATHER = 1;
 
-    private ImageView mUpdateBtn;
+    private ImageView mUpdateBtn, mCitySelect, weatherImg, pmImg;
 
-    private ImageView mCitySelect;
+    private ProgressBar mUpdateBtnProgress;
 
     private TextView cityTv, timeTv, humidityTv, weekTv, pmDataTv, pmQualityTv,
             temperatureTv, climateTv ,windTv, city_name_Tv, nowTemperatureTv;
 
-    private ImageView weatherImg, pmImg;
 
+    //通过消息机制，将解析的天气对象，通过消息发送给主线程，主线程接收到消息数 据后，调用updateTodayWeather函数，更新UI界面上的数据
     private Handler mHandler = new Handler(){
         public void handleMessage(android.os.Message msg){
             Log.d("myWeather","handler启动");
@@ -61,12 +62,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         initView();
         Log.d("myWeather","创建成功");
-
-        mUpdateBtn = (ImageView) findViewById(R.id.title_update_btn);
-        mUpdateBtn.setOnClickListener(this);
-
-        mCitySelect = (ImageView) findViewById(R.id.title_city_manager);
-        mCitySelect.setOnClickListener(this);
 
         //测试是否连接到网络
         if(NetUtil.getNetworkState(this) != NetUtil.NETWORN_NONE){
@@ -93,6 +88,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         windTv = (TextView) findViewById(R.id.wind);
         weatherImg = (ImageView) findViewById(R.id.weather_img);
 
+        mUpdateBtn = (ImageView) findViewById(R.id.title_update_btn);
+        mUpdateBtn.setOnClickListener(this);
+
+        mCitySelect = (ImageView) findViewById(R.id.title_city_manager);
+        mCitySelect.setOnClickListener(this);
+
+        mUpdateBtnProgress = (ProgressBar) findViewById(R.id.title_update_progress);
+
         city_name_Tv.setText("N/A");
         cityTv.setText("N/A");
         timeTv.setText("N/A");
@@ -114,6 +117,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 startActivityForResult(i,1);
                 break;
             case R.id.title_update_btn:
+                //通过SharedPreferences读取城市id，如果没有定义则缺省为101010100(北京城市 ID)
                 SharedPreferences sharedPreferences = getSharedPreferences("config",MODE_PRIVATE);
                 String cityCode = sharedPreferences.getString("main_city_code","101010100");
                 Log.d("myWeather",cityCode);
@@ -122,6 +126,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 if(NetUtil.getNetworkState(this) != NetUtil.NETWORN_NONE){
                     Log.d("myWeather","网络OK");
                     Toast.makeText(MainActivity.this,"网络OK！",Toast.LENGTH_LONG).show();
+                    mUpdateBtn.setVisibility(View.INVISIBLE);
+                    mUpdateBtnProgress.setVisibility(View.VISIBLE);
                     queryWeatherCode(cityCode);
                 }else{
                     Log.d("myWeather","网络挂了");
@@ -134,6 +140,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
+    //利用TodayWeather对象更新UI中的控件
     void updateTodayWeather(TodayWeather todayWeather){
         Log.d("myWeather","更新视图启动");
 
@@ -148,6 +155,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         nowTemperatureTv.setText("当前温度:"+todayWeather.getWendu()+"℃");
         climateTv.setText(todayWeather.getType());
         windTv.setText("风力:"+todayWeather.getFengli());
+
+        mUpdateBtn.setVisibility(View.VISIBLE);
+        mUpdateBtnProgress.setVisibility(View.INVISIBLE);
 
         changeImage(todayWeather);
 
@@ -249,6 +259,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
+    //修改更新按钮的单击事件处理程序，并编写onActivityResult函数用于接收返回的数据
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         //super.onActivityResult(requestCode, resultCode, data);
@@ -268,6 +279,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+    //获取网络数据
     private void queryWeatherCode(String cityCode){
         final String address = "http://wthrcdn.etouch.cn/WeatherApi?citykey=" + cityCode;
         Log.d("myWeather",address);
@@ -292,9 +304,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     }
                     String responseStr = response.toString();
                     Log.d("myWeather",responseStr);
-                    parseXML(responseStr);
+                    parseXML(responseStr);   //在获取网络数据后，调用解析函数
 
-                    todayWeather = parseXML(responseStr);
+                    todayWeather = parseXML(responseStr);  //调用parseXML，并返回TodayWeather对象
                     if(todayWeather != null){
                         Log.d("myWeather",todayWeather.toString());
 
@@ -315,6 +327,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }).start();
     }
 
+    //编写解析函数，解析出城市名称以及更新时间信息，将解析的数据存入TodayWeather对象中
     private TodayWeather parseXML(String xmldata){
         TodayWeather todayWeather = null;
         int fengxiangCount = 0;

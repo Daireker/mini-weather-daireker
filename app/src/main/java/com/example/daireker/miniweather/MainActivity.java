@@ -300,10 +300,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     String str;
                     while((str=reader.readLine()) != null){
                         response.append(str);
-                        Log.d("myWeather",str);
+                        Log.d("str",str);
                     }
                     String responseStr = response.toString();
-                    Log.d("myWeather",responseStr);
+                    Log.d("responseStr",responseStr);
                     parseXML(responseStr);   //在获取网络数据后，调用解析函数
 
                     todayWeather = parseXML(responseStr);  //调用parseXML，并返回TodayWeather对象

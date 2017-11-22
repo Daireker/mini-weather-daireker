@@ -20,6 +20,7 @@ import android.widget.Toast;
 
 import com.example.daireker.app.MyApplication;
 import com.example.daireker.bean.City;
+import com.example.daireker.util.MyAdapter;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -62,6 +63,7 @@ public class SelectCity extends AppCompatActivity implements View.OnClickListene
 
         MyApplication myApplication = (MyApplication) getApplication();
         cityList = myApplication.getCityList();
+        filterDataList = new ArrayList<City>();
         for (City city : cityList) {
             filterDataList.add(city);
         }

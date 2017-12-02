@@ -21,6 +21,7 @@ import android.widget.Toast;
 import com.example.daireker.app.MyApplication;
 import com.example.daireker.bean.City;
 import com.example.daireker.util.MyAdapter;
+import com.example.daireker.util.ToastUtil;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -105,7 +106,7 @@ public class SelectCity extends AppCompatActivity implements View.OnClickListene
             editStart = mSearchCity.getSelectionStart();
             editEnd = mSearchCity.getSelectionEnd();
             if(temp.length()>10){
-                Toast.makeText(SelectCity.this,"你输入的字数已经超过了限制!",Toast.LENGTH_SHORT).show();
+                ToastUtil.showToast(SelectCity.this,"你输入的字数已经超过了限制!");
                 editable.delete(editStart-1,editEnd);
                 int tempSelection = editStart;
                 mSearchCity.setText(editable);

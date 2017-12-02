@@ -18,7 +18,7 @@
         android:orientation="horizontal"
         android:layout_alignParentBottom="true"
         android:gravity="center_horizontal"
-        android:background="#ff000000">
+        android:background="#00000000">
         
         <ImageView
             android:id="@+id/iv1"

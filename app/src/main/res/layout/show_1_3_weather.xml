@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="364dp"
+    android:layout_height="250dp"
+    android:layout_gravity="center"
+    android:background="#00000000">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:layout_marginBottom="30dp">
+
+            <TextView
+                android:id="@+id/tx_day_1"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="0.2"
+                android:gravity="center"
+                android:lines="1"
+                android:text="星期二"
+                android:textSize="18sp"
+                android:textColor="@android:color/white"/>
+
+            <ImageView
+                android:id="@+id/image_day_1"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="0.3"
+                android:src="@drawable/biz_plugin_weather_duoyun"/>
+
+            <TextView
+                android:id="@+id/tx_day_1_temperature"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="0.25"
+                android:gravity="center"
+                android:lines="1"
+                android:text="-4°C~5°C"
+                android:textSize="22sp"
+                android:textColor="@android:color/white"/>
+
+            <TextView
+                android:id="@+id/tx_day_1_climate"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="0.125"
+                android:gravity="center"
+                android:lines="1"
+                android:text="多云转晴"
+                android:textSize="16sp"
+                android:textColor="@android:color/white" />
+
+            <TextView
+                android:id="@+id/tx_day_1_wind"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="0.125"
+                android:gravity="center"
+                android:lines="1"
+                android:text="微风"
+                android:textSize="16sp"
+                android:textColor="@android:color/white"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:layout_marginBottom="30dp">
+
+            <TextView
+                android:id="@+id/tx_day_2"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="0.2"
+                android:gravity="center"
+                android:lines="1"
+                android:text="星期三"
+                android:textSize="18sp"
+                android:textColor="@android:color/white"/>
+
+            <ImageView
+                android:id="@+id/image_day_2"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="0.3"
+                android:src="@drawable/biz_plugin_weather_qing"/>
+
+            <TextView
+                android:id="@+id/tx_day_2_temperature"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="0.25"
+                android:gravity="center"
+                android:lines="1"
+                android:text="-2°C~7°C"
+                android:textSize="22sp"
+                android:textColor="@android:color/white"/>
+
+            <TextView
+                android:id="@+id/tx_day_2_climate"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="0.125"
+                android:gravity="center"
+                android:lines="1"
+                android:text="多云转晴"
+                android:textSize="16sp"
+                android:textColor="@android:color/white" />
+
+            <TextView
+                android:id="@+id/tx_day_2_wind"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="0.125"
+                android:gravity="center"
+                android:lines="1"
+                android:text="微风"
+                android:textSize="16sp"
+                android:textColor="@android:color/white"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:layout_marginBottom="30dp">
+
+            <TextView
+                android:id="@+id/tx_day_3"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="0.2"
+                android:gravity="center"
+                android:lines="1"
+                android:text="星期四"
+                android:textSize="18sp"
+                android:textColor="@android:color/white"/>
+
+            <ImageView
+                android:id="@+id/image_day_3"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="0.3"
+                android:src="@drawable/biz_plugin_weather_qing"/>
+
+            <TextView
+                android:id="@+id/tx_day_3_temperature"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="0.25"
+                android:gravity="center"
+                android:lines="1"
+                android:text="-2°C~8°C"
+                android:textSize="22sp"
+                android:textColor="@android:color/white"/>
+
+            <TextView
+                android:id="@+id/tx_day_3_climate"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="0.125"
+                android:gravity="center"
+                android:lines="1"
+                android:text="晴"
+                android:textSize="16sp"
+                android:textColor="@android:color/white" />
+
+            <TextView
+                android:id="@+id/tx_day_3_wind"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="0.125"
+                android:gravity="center"
+                android:lines="1"
+                android:text="微风"
+                android:textSize="16sp"
+                android:textColor="@android:color/white"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>

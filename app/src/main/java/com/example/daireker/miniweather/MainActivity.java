@@ -2,20 +2,21 @@ package com.example.daireker.miniweather;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.drawable.Drawable;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.daireker.bean.TodayWeather;
 import com.example.daireker.util.NetUtil;
+import com.example.daireker.util.ToastUtil;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
@@ -28,18 +29,32 @@ import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
 
     private static final int UPDATE_TODAY_WEATHER = 1;
 
-    private ImageView mUpdateBtn, mCitySelect, weatherImg, pmImg;
+    private ImageView mUpdateBtn, mCitySelect, weatherImg, pmImg,
+            image_day_1, image_day_2, image_day_3, image_day_4, image_day_5, image_day_6;
 
     private ProgressBar mUpdateBtnProgress;
 
     private TextView cityTv, timeTv, humidityTv, weekTv, pmDataTv, pmQualityTv,
-            temperatureTv, climateTv ,windTv, city_name_Tv, nowTemperatureTv;
+            temperatureTv, climateTv ,windTv, city_name_Tv, nowTemperatureTv,
+            tx_day_1, tx_day_2, tx_day_3, tx_day_4, tx_day_5, tx_day_6,
+            tx_day_1_temperature, tx_day_2_temperature, tx_day_3_temperature,
+            tx_day_4_temperature, tx_day_5_temperature, tx_day_6_temperature,
+            tx_day_1_climate, tx_day_2_climate, tx_day_3_climate,
+            tx_day_4_climate, tx_day_5_climate, tx_day_6_climate,
+            tx_day_1_wind, tx_day_2_wind, tx_day_3_wind, tx_day_4_wind, tx_day_5_wind, tx_day_6_wind;
 
+    private ViewPager vpWeather;
+    private ViewPagerAdapter vpAdapterWeather;
+    private List<View> views;
+    private ImageView[] imageViews;
+    private int[] ids = {R.id.show_1_3, R.id.show_4_6};
 
     //通过消息机制，将解析的天气对象，通过消息发送给主线程，主线程接收到消息数 据后，调用updateTodayWeather函数，更新UI界面上的数据
     private Handler mHandler = new Handler(){
@@ -61,16 +76,92 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.weather_info);
 
         initView();
+        initViewViewPager();
         Log.d("myWeather","创建成功");
+        initDots();
 
         //测试是否连接到网络
         if(NetUtil.getNetworkState(this) != NetUtil.NETWORN_NONE){
             Log.d("myWeather","网络OK");
-            Toast.makeText(MainActivity.this,"网络OK！",Toast.LENGTH_LONG).show();
+            ToastUtil.showToast(MainActivity.this,"网络OK！");
         }else{
             Log.d("myWeather","网络挂了");
-            Toast.makeText(MainActivity.this,"网络挂了！",Toast.LENGTH_LONG).show();
+            ToastUtil.showToast(MainActivity.this,"网络挂了！");
         }
+    }
+
+    void initDots(){
+        imageViews = new ImageView[views.size()];
+        for(int i=0;i<views.size();i++){
+            imageViews[i] = (ImageView) findViewById(ids[i]);
+        }
+    }
+
+    void initViewViewPager(){
+        tx_day_1 = views.get(0).findViewById(R.id.tx_day_1);
+        tx_day_2 = views.get(0).findViewById(R.id.tx_day_2);
+        tx_day_3 = views.get(0).findViewById(R.id.tx_day_3);
+        tx_day_4 = views.get(1).findViewById(R.id.tx_day_4);
+        tx_day_5 = views.get(1).findViewById(R.id.tx_day_5);
+        tx_day_6 = views.get(1).findViewById(R.id.tx_day_6);
+        tx_day_1.setText("N/A");
+        tx_day_2.setText("N/A");
+        tx_day_3.setText("N/A");
+        tx_day_4.setText("N/A");
+        tx_day_5.setText("N/A");
+        tx_day_6.setText("N/A");
+
+        tx_day_1_temperature = views.get(0).findViewById(R.id.tx_day_1_temperature);
+        tx_day_2_temperature = views.get(0).findViewById(R.id.tx_day_2_temperature);
+        tx_day_3_temperature = views.get(0).findViewById(R.id.tx_day_3_temperature);
+        tx_day_4_temperature = views.get(1).findViewById(R.id.tx_day_4_temperature);
+        tx_day_5_temperature = views.get(1).findViewById(R.id.tx_day_5_temperature);
+        tx_day_6_temperature = views.get(1).findViewById(R.id.tx_day_6_temperature);
+        tx_day_1_temperature.setText("N/A");
+        tx_day_2_temperature.setText("N/A");
+        tx_day_3_temperature.setText("N/A");
+        tx_day_4_temperature.setText("N/A");
+        tx_day_5_temperature.setText("N/A");
+        tx_day_6_temperature.setText("N/A");
+
+        tx_day_1_climate = views.get(0).findViewById(R.id.tx_day_1_climate);
+        tx_day_2_climate = views.get(0).findViewById(R.id.tx_day_2_climate);
+        tx_day_3_climate = views.get(0).findViewById(R.id.tx_day_3_climate);
+        tx_day_4_climate = views.get(1).findViewById(R.id.tx_day_4_climate);
+        tx_day_5_climate = views.get(1).findViewById(R.id.tx_day_5_climate);
+        tx_day_6_climate = views.get(1).findViewById(R.id.tx_day_6_climate);
+        tx_day_1_climate.setText("N/A");
+        tx_day_2_climate.setText("N/A");
+        tx_day_3_climate.setText("N/A");
+        tx_day_4_climate.setText("N/A");
+        tx_day_5_climate.setText("N/A");
+        tx_day_6_climate.setText("N/A");
+
+        tx_day_1_wind = views.get(0).findViewById(R.id.tx_day_1_wind);
+        tx_day_2_wind = views.get(0).findViewById(R.id.tx_day_2_wind);
+        tx_day_3_wind = views.get(0).findViewById(R.id.tx_day_3_wind);
+        tx_day_4_wind = views.get(1).findViewById(R.id.tx_day_4_wind);
+        tx_day_5_wind = views.get(1).findViewById(R.id.tx_day_5_wind);
+        tx_day_6_wind = views.get(1).findViewById(R.id.tx_day_6_wind);
+        tx_day_1_wind.setText("N/A");
+        tx_day_2_wind.setText("N/A");
+        tx_day_3_wind.setText("N/A");
+        tx_day_4_wind.setText("N/A");
+        tx_day_5_wind.setText("N/A");
+        tx_day_6_wind.setText("N/A");
+
+        image_day_1 = views.get(0).findViewById(R.id.image_day_1);
+        image_day_2 = views.get(0).findViewById(R.id.image_day_2);
+        image_day_3 = views.get(0).findViewById(R.id.image_day_3);
+        image_day_4 = views.get(1).findViewById(R.id.image_day_4);
+        image_day_5 = views.get(1).findViewById(R.id.image_day_5);
+        image_day_6 = views.get(1).findViewById(R.id.image_day_6);
+        image_day_1.setImageResource(R.drawable.biz_plugin_weather_qing);
+        image_day_2.setImageResource(R.drawable.biz_plugin_weather_qing);
+        image_day_3.setImageResource(R.drawable.biz_plugin_weather_qing);
+        image_day_4.setImageResource(R.drawable.biz_plugin_weather_qing);
+        image_day_5.setImageResource(R.drawable.biz_plugin_weather_qing);
+        image_day_6.setImageResource(R.drawable.biz_plugin_weather_qing);
     }
 
     void initView(){
@@ -107,6 +198,36 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         nowTemperatureTv.setText("N/A");
         climateTv.setText("N/A");
         windTv.setText("N/A");
+
+        LayoutInflater inflater = LayoutInflater.from(this);
+        views = new ArrayList<View>();
+        views.add(inflater.inflate(R.layout.show_1_3_weather,null));
+        views.add(inflater.inflate(R.layout.show_4_6_weather,null));
+        vpAdapterWeather = new ViewPagerAdapter(views,this);
+        vpWeather = (ViewPager) findViewById(R.id.weather_viewpager);
+        vpWeather.setAdapter(vpAdapterWeather);
+        vpWeather.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                for (int a=0;a<ids.length;a++){
+                    if(a == position){
+                        imageViews[a].setImageResource(R.drawable.page_indicator_focused);
+                    }else {
+                        imageViews[a].setImageResource(R.drawable.page_indicator_unfocused);
+                    }
+                }
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
     }
 
     public void onClick(View view){
@@ -125,13 +246,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 //测试是否连接到网络
                 if(NetUtil.getNetworkState(this) != NetUtil.NETWORN_NONE){
                     Log.d("myWeather","网络OK");
-                    Toast.makeText(MainActivity.this,"网络OK！",Toast.LENGTH_LONG).show();
+                    ToastUtil.showToast(MainActivity.this,"网络OK！");
                     mUpdateBtn.setVisibility(View.INVISIBLE);
                     mUpdateBtnProgress.setVisibility(View.VISIBLE);
                     queryWeatherCode(cityCode);
                 }else{
                     Log.d("myWeather","网络挂了");
-                    Toast.makeText(MainActivity.this,"网络挂了！",Toast.LENGTH_LONG).show();
+                    ToastUtil.showToast(MainActivity.this,"网络挂了！");
                 }
                 break;
             default:
@@ -156,12 +277,42 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         climateTv.setText(todayWeather.getType());
         windTv.setText("风力:"+todayWeather.getFengli());
 
+        tx_day_1.setText(todayWeather.getDate_1());
+        tx_day_1_temperature.setText(todayWeather.getLow_1()+"~"+todayWeather.getHigh_1());
+        tx_day_1_climate.setText(todayWeather.getType_1());
+        tx_day_1_wind.setText(todayWeather.getFengli_1());
+
+        tx_day_2.setText(todayWeather.getDate());
+        tx_day_2_temperature.setText(todayWeather.getLow()+"~"+todayWeather.getHigh());
+        tx_day_2_climate.setText(todayWeather.getType());
+        tx_day_2_wind.setText(todayWeather.getFengli());
+
+        tx_day_3.setText(todayWeather.getDate_3());
+        tx_day_3_temperature.setText(todayWeather.getLow_3()+"~"+todayWeather.getHigh_3());
+        tx_day_3_climate.setText(todayWeather.getType_3());
+        tx_day_3_wind.setText(todayWeather.getFengli_3());
+
+        tx_day_4.setText(todayWeather.getDate_4());
+        tx_day_4_temperature.setText(todayWeather.getLow_4()+"~"+todayWeather.getHigh_4());
+        tx_day_4_climate.setText(todayWeather.getType_4());
+        tx_day_4_wind.setText(todayWeather.getFengli_4());
+
+        tx_day_5.setText(todayWeather.getDate_5());
+        tx_day_5_temperature.setText(todayWeather.getLow_5()+"~"+todayWeather.getHigh_5());
+        tx_day_5_climate.setText(todayWeather.getType_5());
+        tx_day_5_wind.setText(todayWeather.getFengli_5());
+
+        tx_day_6.setText(todayWeather.getDate_6());
+        tx_day_6_temperature.setText(todayWeather.getLow_6()+"~"+todayWeather.getHigh_6());
+        tx_day_6_climate.setText(todayWeather.getType_6());
+        tx_day_6_wind.setText(todayWeather.getFengli_6());
+
         mUpdateBtn.setVisibility(View.VISIBLE);
         mUpdateBtnProgress.setVisibility(View.INVISIBLE);
 
         changeImage(todayWeather);
 
-        Toast.makeText(MainActivity.this,"更新成功!",Toast.LENGTH_SHORT).show();
+        ToastUtil.showToast(MainActivity.this,"更新成功！");
     }
 
     void changeImage(TodayWeather todayWeather){
@@ -191,6 +342,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
 
         String t = todayWeather.getType();
+        String t1 = todayWeather.getType_1();
+        String t2 = todayWeather.getType_2();
+        String t3 = todayWeather.getType_3();
+        String t4 = todayWeather.getType_4();
+        String t5 = todayWeather.getType_5();
+        String t6 = todayWeather.getType_6();
 
         try{
             if(t.equals("多云")){
@@ -253,6 +410,372 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             else {
                 weatherImg.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_qing));
             }
+
+            if(t1.equals("多云")){
+                image_day_1.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_duoyun));
+            }
+            else if(t1.equals("暴雪")){
+                image_day_1.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_baoxue));
+            }
+            else if(t1.equals("暴雨")){
+                image_day_1.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_baoyu));
+            }
+            else if(t1.equals("大暴雨")){
+                image_day_1.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_dabaoyu));
+            }
+            else if(t1.equals("特大暴雨")){
+                image_day_1.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_tedabaoyu));
+            }
+            else if(t1.equals("大雪")){
+                image_day_1.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_daxue));
+            }
+            else if(t1.equals("大雨")){
+                image_day_1.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_dayu));
+            }
+            else if(t1.equals("雷阵雨")){
+                image_day_1.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_leizhenyu));
+            }
+            else if(t1.equals("雷阵雨冰雹")){
+                image_day_1.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_leizhenyubingbao));
+            }
+            else if(t1.equals("沙尘暴")){
+                image_day_1.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_shachenbao));
+            }
+            else if(t1.equals("雾")){
+                image_day_1.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_wu));
+            }
+            else if(t1.equals("小雪")){
+                image_day_1.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_xiaoxue));
+            }
+            else if(t1.equals("小雨")){
+                image_day_1.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_xiaoyu));
+            }
+            else if(t1.equals("阴")){
+                image_day_1.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_yin));
+            }
+            else if(t1.equals("雨夹雪")){
+                image_day_1.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_yujiaxue));
+            }
+            else if(t1.equals("阵雪")){
+                image_day_1.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_zhenxue));
+            }
+            else if(t1.equals("阵雨")){
+                image_day_1.setImageDrawable((getResources().getDrawable(R.drawable.biz_plugin_weather_zhenyu)));
+            }
+            else if(t1.equals("中雪")){
+                image_day_1.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_zhongxue));
+            }
+            else if(t1.equals("中雨")){
+                image_day_1.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_zhongyu));
+            }
+            else {
+                image_day_1.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_qing));
+            }
+
+            if(t.equals("多云")){
+                image_day_2.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_duoyun));
+            }
+            else if(t.equals("暴雪")){
+                image_day_2.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_baoxue));
+            }
+            else if(t.equals("暴雨")){
+                image_day_2.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_baoyu));
+            }
+            else if(t.equals("大暴雨")){
+                image_day_2.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_dabaoyu));
+            }
+            else if(t.equals("特大暴雨")){
+                image_day_2.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_tedabaoyu));
+            }
+            else if(t.equals("大雪")){
+                image_day_2.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_daxue));
+            }
+            else if(t.equals("大雨")){
+                image_day_2.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_dayu));
+            }
+            else if(t.equals("雷阵雨")){
+                image_day_2.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_leizhenyu));
+            }
+            else if(t.equals("雷阵雨冰雹")){
+                image_day_2.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_leizhenyubingbao));
+            }
+            else if(t.equals("沙尘暴")){
+                image_day_2.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_shachenbao));
+            }
+            else if(t.equals("雾")){
+                image_day_2.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_wu));
+            }
+            else if(t.equals("小雪")){
+                image_day_2.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_xiaoxue));
+            }
+            else if(t.equals("小雨")){
+                image_day_2.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_xiaoyu));
+            }
+            else if(t.equals("阴")){
+                image_day_2.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_yin));
+            }
+            else if(t.equals("雨夹雪")){
+                image_day_2.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_yujiaxue));
+            }
+            else if(t.equals("阵雪")){
+                image_day_2.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_zhenxue));
+            }
+            else if(t.equals("阵雨")){
+                image_day_2.setImageDrawable((getResources().getDrawable(R.drawable.biz_plugin_weather_zhenyu)));
+            }
+            else if(t.equals("中雪")){
+                image_day_2.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_zhongxue));
+            }
+            else if(t.equals("中雨")){
+                image_day_2.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_zhongyu));
+            }
+            else {
+                image_day_2.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_qing));
+            }
+
+            if(t3.equals("多云")){
+                image_day_3.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_duoyun));
+            }
+            else if(t3.equals("暴雪")){
+                image_day_3.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_baoxue));
+            }
+            else if(t3.equals("暴雨")){
+                image_day_3.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_baoyu));
+            }
+            else if(t3.equals("大暴雨")){
+                image_day_3.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_dabaoyu));
+            }
+            else if(t3.equals("特大暴雨")){
+                image_day_3.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_tedabaoyu));
+            }
+            else if(t3.equals("大雪")){
+                image_day_3.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_daxue));
+            }
+            else if(t3.equals("大雨")){
+                image_day_3.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_dayu));
+            }
+            else if(t3.equals("雷阵雨")){
+                image_day_3.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_leizhenyu));
+            }
+            else if(t3.equals("雷阵雨冰雹")){
+                image_day_3.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_leizhenyubingbao));
+            }
+            else if(t3.equals("沙尘暴")){
+                image_day_3.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_shachenbao));
+            }
+            else if(t3.equals("雾")){
+                image_day_3.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_wu));
+            }
+            else if(t3.equals("小雪")){
+                image_day_3.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_xiaoxue));
+            }
+            else if(t3.equals("小雨")){
+                image_day_3.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_xiaoyu));
+            }
+            else if(t3.equals("阴")){
+                image_day_3.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_yin));
+            }
+            else if(t3.equals("雨夹雪")){
+                image_day_3.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_yujiaxue));
+            }
+            else if(t3.equals("阵雪")){
+                image_day_3.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_zhenxue));
+            }
+            else if(t3.equals("阵雨")){
+                image_day_3.setImageDrawable((getResources().getDrawable(R.drawable.biz_plugin_weather_zhenyu)));
+            }
+            else if(t3.equals("中雪")){
+                image_day_3.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_zhongxue));
+            }
+            else if(t3.equals("中雨")){
+                image_day_3.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_zhongyu));
+            }
+            else {
+                image_day_3.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_qing));
+            }
+
+            if(t4.equals("多云")){
+                image_day_4.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_duoyun));
+            }
+            else if(t4.equals("暴雪")){
+                image_day_4.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_baoxue));
+            }
+            else if(t4.equals("暴雨")){
+                image_day_4.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_baoyu));
+            }
+            else if(t4.equals("大暴雨")){
+                image_day_4.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_dabaoyu));
+            }
+            else if(t4.equals("特大暴雨")){
+                image_day_4.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_tedabaoyu));
+            }
+            else if(t4.equals("大雪")){
+                image_day_4.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_daxue));
+            }
+            else if(t4.equals("大雨")){
+                image_day_4.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_dayu));
+            }
+            else if(t4.equals("雷阵雨")){
+                image_day_4.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_leizhenyu));
+            }
+            else if(t4.equals("雷阵雨冰雹")){
+                image_day_4.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_leizhenyubingbao));
+            }
+            else if(t4.equals("沙尘暴")){
+                image_day_4.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_shachenbao));
+            }
+            else if(t4.equals("雾")){
+                image_day_4.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_wu));
+            }
+            else if(t4.equals("小雪")){
+                image_day_4.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_xiaoxue));
+            }
+            else if(t4.equals("小雨")){
+                image_day_4.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_xiaoyu));
+            }
+            else if(t4.equals("阴")){
+                image_day_4.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_yin));
+            }
+            else if(t4.equals("雨夹雪")){
+                image_day_4.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_yujiaxue));
+            }
+            else if(t4.equals("阵雪")){
+                image_day_4.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_zhenxue));
+            }
+            else if(t4.equals("阵雨")){
+                image_day_4.setImageDrawable((getResources().getDrawable(R.drawable.biz_plugin_weather_zhenyu)));
+            }
+            else if(t4.equals("中雪")){
+                image_day_4.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_zhongxue));
+            }
+            else if(t4.equals("中雨")){
+                image_day_4.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_zhongyu));
+            }
+            else {
+                image_day_4.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_qing));
+            }
+
+            if(t5.equals("多云")){
+                image_day_5.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_duoyun));
+            }
+            else if(t5.equals("暴雪")){
+                image_day_5.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_baoxue));
+            }
+            else if(t5.equals("暴雨")){
+                image_day_5.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_baoyu));
+            }
+            else if(t5.equals("大暴雨")){
+                image_day_5.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_dabaoyu));
+            }
+            else if(t5.equals("特大暴雨")){
+                image_day_5.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_tedabaoyu));
+            }
+            else if(t5.equals("大雪")){
+                image_day_5.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_daxue));
+            }
+            else if(t5.equals("大雨")){
+                image_day_5.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_dayu));
+            }
+            else if(t5.equals("雷阵雨")){
+                image_day_5.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_leizhenyu));
+            }
+            else if(t5.equals("雷阵雨冰雹")){
+                image_day_5.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_leizhenyubingbao));
+            }
+            else if(t5.equals("沙尘暴")){
+                image_day_5.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_shachenbao));
+            }
+            else if(t5.equals("雾")){
+                image_day_5.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_wu));
+            }
+            else if(t5.equals("小雪")){
+                image_day_5.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_xiaoxue));
+            }
+            else if(t5.equals("小雨")){
+                image_day_5.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_xiaoyu));
+            }
+            else if(t5.equals("阴")){
+                image_day_5.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_yin));
+            }
+            else if(t5.equals("雨夹雪")){
+                image_day_5.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_yujiaxue));
+            }
+            else if(t5.equals("阵雪")){
+                image_day_5.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_zhenxue));
+            }
+            else if(t5.equals("阵雨")){
+                image_day_5.setImageDrawable((getResources().getDrawable(R.drawable.biz_plugin_weather_zhenyu)));
+            }
+            else if(t5.equals("中雪")){
+                image_day_5.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_zhongxue));
+            }
+            else if(t5.equals("中雨")){
+                image_day_5.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_zhongyu));
+            }
+            else {
+                image_day_5.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_qing));
+            }
+
+            if(t6.equals("多云")){
+                image_day_6.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_duoyun));
+            }
+            else if(t6.equals("暴雪")){
+                image_day_6.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_baoxue));
+            }
+            else if(t6.equals("暴雨")){
+                image_day_6.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_baoyu));
+            }
+            else if(t6.equals("大暴雨")){
+                image_day_6.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_dabaoyu));
+            }
+            else if(t6.equals("特大暴雨")){
+                image_day_6.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_tedabaoyu));
+            }
+            else if(t6.equals("大雪")){
+                image_day_6.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_daxue));
+            }
+            else if(t6.equals("大雨")){
+                image_day_6.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_dayu));
+            }
+            else if(t6.equals("雷阵雨")){
+                image_day_6.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_leizhenyu));
+            }
+            else if(t6.equals("雷阵雨冰雹")){
+                image_day_6.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_leizhenyubingbao));
+            }
+            else if(t6.equals("沙尘暴")){
+                image_day_6.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_shachenbao));
+            }
+            else if(t6.equals("雾")){
+                image_day_6.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_wu));
+            }
+            else if(t6.equals("小雪")){
+                image_day_6.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_xiaoxue));
+            }
+            else if(t6.equals("小雨")){
+                image_day_6.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_xiaoyu));
+            }
+            else if(t6.equals("阴")){
+                image_day_6.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_yin));
+            }
+            else if(t6.equals("雨夹雪")){
+                image_day_6.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_yujiaxue));
+            }
+            else if(t6.equals("阵雪")){
+                image_day_6.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_zhenxue));
+            }
+            else if(t6.equals("阵雨")){
+                image_day_6.setImageDrawable((getResources().getDrawable(R.drawable.biz_plugin_weather_zhenyu)));
+            }
+            else if(t6.equals("中雪")){
+                image_day_6.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_zhongxue));
+            }
+            else if(t6.equals("中雨")){
+                image_day_6.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_zhongyu));
+            }
+            else {
+                image_day_6.setImageDrawable(getResources().getDrawable(R.drawable.biz_plugin_weather_qing));
+            }
         }catch(Exception e){
             e.printStackTrace();
         }
@@ -270,11 +793,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             //测试是否连接到网络
             if(NetUtil.getNetworkState(this) != NetUtil.NETWORN_NONE){
                 Log.d("myWeather","网络OK");
-                Toast.makeText(MainActivity.this,"网络OK！",Toast.LENGTH_LONG).show();
+                ToastUtil.showToast(MainActivity.this,"网络OK！");
                 queryWeatherCode(newCityCode);
             }else{
                 Log.d("myWeather","网络挂了");
-                Toast.makeText(MainActivity.this,"网络挂了！",Toast.LENGTH_LONG).show();
+                ToastUtil.showToast(MainActivity.this,"网络挂了！");
             }
         }
     }
@@ -407,6 +930,101 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 todayWeather.setType(xmlPullParser.getText());
                                 Log.d("myWeather","type:    "+xmlPullParser.getText());
                                 typeCount++;
+                            }else if(xmlPullParser.getName().equals("date_1")){
+                                eventType = xmlPullParser.next();
+                                todayWeather.setDate_1(xmlPullParser.getText());
+                            }else if(xmlPullParser.getName().equals("high_1")){
+                                eventType = xmlPullParser.next();
+                                todayWeather.setHigh_1(xmlPullParser.getText().substring(2).trim());
+                            }else if(xmlPullParser.getName().equals("low_1")){
+                                eventType = xmlPullParser.next();
+                                todayWeather.setLow_1(xmlPullParser.getText().substring(2).trim());
+                            }else if(xmlPullParser.getName().equals("fl_1")){
+                                eventType = xmlPullParser.next();
+                                todayWeather.setFengli_1(xmlPullParser.getText());
+                            }else if(xmlPullParser.getName().equals("type_1")){
+                                eventType = xmlPullParser.next();
+                                todayWeather.setType_1(xmlPullParser.getText());
+                            }else if(xmlPullParser.getName().equals("date") && dateCount == 1){
+                                eventType = xmlPullParser.next();
+                                todayWeather.setDate_3(xmlPullParser.getText());
+                                dateCount++;
+                            }else if(xmlPullParser.getName().equals("high") && highCount == 1){
+                                eventType = xmlPullParser.next();
+                                todayWeather.setHigh_3(xmlPullParser.getText().substring(2).trim());
+                                highCount++;
+                            }else if(xmlPullParser.getName().equals("low") && lowCount == 1){
+                                eventType = xmlPullParser.next();
+                                todayWeather.setLow_3(xmlPullParser.getText().substring(2).trim());
+                                lowCount++;
+                            }else if(xmlPullParser.getName().equals("type") && typeCount == 1){
+                                eventType = xmlPullParser.next();
+                                todayWeather.setType_3(xmlPullParser.getText());
+                                typeCount++;
+                            }else if(xmlPullParser.getName().equals("fengli") && fengliCount == 1){
+                                eventType = xmlPullParser.next();
+                                todayWeather.setFengli_3(xmlPullParser.getText());
+                                fengliCount++;
+                            }else if(xmlPullParser.getName().equals("date") && dateCount == 2){
+                                eventType = xmlPullParser.next();
+                                todayWeather.setDate_4(xmlPullParser.getText());
+                                dateCount++;
+                            }else if(xmlPullParser.getName().equals("high") && highCount == 2){
+                                eventType = xmlPullParser.next();
+                                todayWeather.setHigh_4(xmlPullParser.getText().substring(2).trim());
+                                highCount++;
+                            }else if(xmlPullParser.getName().equals("low") && lowCount == 2){
+                                eventType = xmlPullParser.next();
+                                todayWeather.setLow_4(xmlPullParser.getText().substring(2).trim());
+                                lowCount++;
+                            }else if(xmlPullParser.getName().equals("type") && typeCount == 2){
+                                eventType = xmlPullParser.next();
+                                todayWeather.setType_4(xmlPullParser.getText());
+                                typeCount++;
+                            }else if(xmlPullParser.getName().equals("fengli") && fengliCount == 2){
+                                eventType = xmlPullParser.next();
+                                todayWeather.setFengli_4(xmlPullParser.getText());
+                                fengliCount++;
+                            }else if(xmlPullParser.getName().equals("date") && dateCount == 3){
+                                eventType = xmlPullParser.next();
+                                todayWeather.setDate_5(xmlPullParser.getText());
+                                dateCount++;
+                            }else if(xmlPullParser.getName().equals("high") && highCount == 3){
+                                eventType = xmlPullParser.next();
+                                todayWeather.setHigh_5(xmlPullParser.getText().substring(2).trim());
+                                highCount++;
+                            }else if(xmlPullParser.getName().equals("low") && lowCount == 3){
+                                eventType = xmlPullParser.next();
+                                todayWeather.setLow_5(xmlPullParser.getText().substring(2).trim());
+                                lowCount++;
+                            }else if(xmlPullParser.getName().equals("type") && typeCount == 3){
+                                eventType = xmlPullParser.next();
+                                todayWeather.setType_5(xmlPullParser.getText());
+                                typeCount++;
+                            }else if(xmlPullParser.getName().equals("fengli") && fengliCount == 3){
+                                eventType = xmlPullParser.next();
+                                todayWeather.setFengli_5(xmlPullParser.getText());
+                                fengliCount++;
+                            }else if(xmlPullParser.getName().equals("date") && dateCount == 4){
+                                eventType = xmlPullParser.next();
+                                todayWeather.setDate_6(xmlPullParser.getText());
+                                dateCount++;
+                            }else if(xmlPullParser.getName().equals("high") && highCount == 4){
+                                eventType = xmlPullParser.next();
+                                todayWeather.setHigh_6(xmlPullParser.getText().substring(2).trim());
+                                highCount++;
+                            }else if(xmlPullParser.getName().equals("low") && lowCount == 4){
+                                eventType = xmlPullParser.next();
+                                todayWeather.setLow_6(xmlPullParser.getText().substring(2).trim());
+                                lowCount++;
+                            }else if(xmlPullParser.getName().equals("type") && typeCount == 4){
+                                eventType = xmlPullParser.next();
+                                todayWeather.setType_6(xmlPullParser.getText());
+                                typeCount++;
+                            }else if(xmlPullParser.getName().equals("fengli") && fengliCount == 4){
+                                eventType = xmlPullParser.next();
+                                todayWeather.setFengli_6(xmlPullParser.getText());
+                                fengliCount++;
                             }
                         }
                         break;

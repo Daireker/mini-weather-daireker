@@ -36,36 +36,34 @@
 
     </RelativeLayout>
 
-    <RelativeLayout
-        android:layout_width="match_parent"
+
+    <!--搜索城市的组件-->
+    <com.example.daireker.miniweather.ClearEditText
+        android:id="@+id/search_city"
+        android:layout_below="@+id/title_top"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/title_top">
-        
-        <com.example.daireker.miniweather.ClearEditText
-            android:id="@+id/search_city"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="搜索全国城市（中文）"
-            android:layout_margin="10dp"
-            android:drawableLeft="@drawable/magnifying_glass"
-            android:drawablePadding="8dp"
-            android:paddingTop="8dp"
-            android:paddingLeft="10dp"
-            android:paddingRight="30dp"
-            android:paddingBottom="8dp"
-            android:maxLines="1"
-            android:background="@drawable/contact_search_box_edittext_keyword_background"
-            android:textColor="#ff000000"
-            android:textColorHint="#ffcccccc"
-            android:textSize="15dp"/>
-        
+        android:layout_margin="4.0dp"
+        android:hint="搜索全国城市（中文）"
+        android:drawableLeft="@drawable/magnifying_glass"
+        android:drawablePadding="6.0dp"
+        android:lines="1"
+        android:background="@drawable/contact_search_box_edittext_keyword_background"
+        android:textColor="#ff000000"
+        android:textColorHint="#ffcccccc"
+        android:textSize="15.0dp" />
+
+    <!--选择城市的布局和listview控件-->
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/search_city">
+
         <ListView
             android:id="@+id/title_list"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/search_city"
-            android:background="#ffffff">
-
+            android:background="#00000000">
         </ListView>
 
     </RelativeLayout>

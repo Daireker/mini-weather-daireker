@@ -1,10 +1,14 @@
 package com.example.daireker.miniweather;
 
+import android.Manifest;
+import android.annotation.TargetApi;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -17,6 +21,10 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.baidu.location.BDLocation;
+import com.baidu.location.BDLocationListener;
+import com.baidu.location.LocationClient;
+import com.baidu.location.LocationClientOption;
 import com.example.daireker.bean.TodayWeather;
 import com.example.daireker.util.MyService;
 import com.example.daireker.util.NetUtil;
@@ -39,8 +47,9 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
 
     private static final int UPDATE_TODAY_WEATHER = 1;
+    private static final  int REQUEST_CODE_ACCESS_COARSE_LOCATION = 1;
 
-    private ImageView mUpdateBtn, mCitySelect, weatherImg, pmImg,
+    private ImageView mUpdateBtn, mCitySelect, mLocation, mShare,weatherImg, pmImg,
             image_day_1, image_day_2, image_day_3, image_day_4, image_day_5, image_day_6;
 
     private ProgressBar mUpdateBtnProgress;
@@ -59,6 +68,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private List<View> views;
     private ImageView[] imageViews;
     private int[] ids = {R.id.show_1_3, R.id.show_4_6};
+
+    public LocationClient mLocationClient = null;
+    private MyLocationListener myLocationListener = new MyLocationListener();
+
+    private final int SDK_PERMISSION_REQUEST = 127;
+    private String permissionInfo;
 
     //通过消息机制，将解析的天气对象，通过消息发送给主线程，主线程接收到消息数 据后，调用updateTodayWeather函数，更新UI界面上的数据
     private Handler mHandler = new Handler(){
@@ -83,6 +98,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         initViewViewPager();
         Log.d("myWeather","创建成功");
         initDots();
+        mLocationClient = new LocationClient(getApplicationContext());
+        //声明LocationClient类
+        mLocationClient.registerLocationListener(myLocationListener);
+        //注册监听函数
+
+        LocationClientOption option = new LocationClientOption();
+        option.setOpenGps(true);
+        option.setCoorType("bd09ll"); // 设置坐标类型
+        option.setIsNeedAddress(true);
+        option.setAddrType("all");
+        //可选，是否需要地址信息，默认为不需要，即参数为false
+
+        mLocationClient.setLocOption(option);
+        //mLocationClient为第二步初始化过的LocationClient对象
+        //需将配置好的LocationClientOption对象，通过setLocOption方法传递给LocationClient对象使用
+
 
         //测试是否连接到网络
         if(NetUtil.getNetworkState(this) != NetUtil.NETWORN_NONE){
@@ -110,6 +141,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onDestroy(){
         super.onDestroy();
         stopService(new Intent(MainActivity.this, MyService.class));
+        if (mLocationClient != null && mLocationClient.isStarted()) {
+            mLocationClient.stop();
+            mLocationClient = null;
+        }
     }
 
     public class MyBroadcst extends BroadcastReceiver{
@@ -118,6 +153,40 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             SharedPreferences sharedPreferences = getSharedPreferences("config",MODE_PRIVATE);
             String cityCode = sharedPreferences.getString("main_city_code","101010100");
             queryWeatherCode(cityCode);
+        }
+    }
+
+    public class MyLocationListener implements BDLocationListener {
+        @Override
+        public void onReceiveLocation(BDLocation location){
+            //此处的BDLocation为定位结果信息类，通过它的各种get方法可获取定位相关的全部结果
+            //以下只列举部分获取地址相关的结果信息
+            //更多结果信息获取说明，请参照类参考中BDLocation类中的说明
+
+            String addr = location.getAddrStr();    //获取详细地址信息
+            String country = location.getCountry();    //获取国家
+            String province = location.getProvince();    //获取省份
+            String city = location.getCity();    //获取城市
+            String district = location.getDistrict();    //获取区县
+            String street = location.getStreet();    //获取街道信息
+            String citycode = location.getCityCode();
+
+            double latitude = location.getLatitude();    //获取纬度信息
+            double longitude = location.getLongitude();    //获取经度信息
+            int errorCode = location.getLocType();
+
+            Log.d("Location","定位内部！");
+
+            Log.d("Location","country= " + country);
+            Log.d("Location","province= " + province);
+            Log.d("Location","city= " + city);
+            Log.d("Location","addr= " + addr);
+            Log.d("Location","citycode= " + citycode);
+
+            Log.d("Location","latitude= " + latitude);
+            Log.d("Location","longitude= " + longitude);
+            Log.d("Location","errorCode= " + errorCode);
+            ToastUtil.showToast(MainActivity.this,"城市定位为：" + city);
         }
     }
 
@@ -216,6 +285,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mCitySelect = (ImageView) findViewById(R.id.title_city_manager);
         mCitySelect.setOnClickListener(this);
 
+        mLocation = (ImageView) findViewById(R.id.title_location);
+        mLocation.setOnClickListener(this);
+
+        mShare = (ImageView) findViewById(R.id.title_share);
+        mShare.setOnClickListener(this);
+
         mUpdateBtnProgress = (ProgressBar) findViewById(R.id.title_update_progress);
 
         city_name_Tv.setText("N/A");
@@ -261,6 +336,61 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         });
     }
 
+    @TargetApi(23)
+    private void getPersimmions() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            ArrayList<String> permissions = new ArrayList<String>();
+            /***
+             * 定位权限为必须权限，用户如果禁止，则每次进入都会申请
+             */
+            // 定位精确位置
+            if(checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED){
+                permissions.add(Manifest.permission.ACCESS_FINE_LOCATION);
+            }
+            if(checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED){
+                permissions.add(Manifest.permission.ACCESS_COARSE_LOCATION);
+            }
+			/*
+			 * 读写权限和电话状态权限非必要权限(建议授予)只会申请一次，用户同意或者禁止，只会弹一次
+			 */
+            // 读写权限
+            if (addPermission(permissions, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                permissionInfo += "Manifest.permission.WRITE_EXTERNAL_STORAGE Deny \n";
+            }
+            // 读取电话状态权限
+            if (addPermission(permissions, Manifest.permission.READ_PHONE_STATE)) {
+                permissionInfo += "Manifest.permission.READ_PHONE_STATE Deny \n";
+            }
+
+            if (permissions.size() > 0) {
+                requestPermissions(permissions.toArray(new String[permissions.size()]), SDK_PERMISSION_REQUEST);
+            }
+        }
+    }
+
+    @TargetApi(23)
+    private boolean addPermission(ArrayList<String> permissionsList, String permission) {
+        if (checkSelfPermission(permission) != PackageManager.PERMISSION_GRANTED) { // 如果应用没有获得对应权限,则添加到列表中,准备批量申请
+            if (shouldShowRequestPermissionRationale(permission)){
+                return true;
+            }else{
+                permissionsList.add(permission);
+                return false;
+            }
+
+        }else{
+            return true;
+        }
+    }
+
+    @TargetApi(23)
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        // TODO Auto-generated method stub
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+    }
+
     public void onClick(View view){
         switch (view.getId()){
             case R.id.title_city_manager:
@@ -286,6 +416,34 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     Log.d("myWeather","网络挂了");
                     ToastUtil.showToast(MainActivity.this,"网络挂了！");
                 }
+                break;
+            case R.id.title_location:
+                Log.d("Location","开始定位！");
+                getPersimmions();
+
+                LocationClientOption option = new LocationClientOption();
+                //option.setScanSpan(100);
+                option.setOpenGps(true);// 打开gps
+                option.setCoorType("bd09ll"); // 设置坐标类型
+                option.setIsNeedAddress(true);
+                option.setAddrType("all");
+                //可选，是否需要地址信息，默认为不需要，即参数为false
+
+                mLocationClient.setLocOption(option);
+                //mLocationClient为第二步初始化过的LocationClient对象
+                //需将配置好的LocationClientOption对象，通过setLocOption方法传递给LocationClient对象使用
+                if(mLocationClient == null){
+                    return;
+                }
+                if(mLocationClient.isStarted()){
+                    mLocationClient.stop();
+                    mLocationClient.start();
+                }else {
+                    mLocationClient.start();
+                }
+                break;
+            case R.id.title_share:
+                ToastUtil.showToast(MainActivity.this,"To Be Continue...");
                 break;
             default:
                 break;

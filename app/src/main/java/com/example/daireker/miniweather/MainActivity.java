@@ -29,6 +29,7 @@ import com.example.daireker.bean.TodayWeather;
 import com.example.daireker.util.MyService;
 import com.example.daireker.util.NetUtil;
 import com.example.daireker.util.ToastUtil;
+import com.example.daireker.util.UpdateWidgetService;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
@@ -136,6 +137,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void startService(){
         Intent updateService = new Intent(this, MyService.class);
         startService(updateService);
+    }
+
+    protected void updateWidgetService(String cityCode){
+        Intent widgetUpdate = new Intent(this, UpdateWidgetService.class);
+        widgetUpdate.putExtra("citycode",cityCode);
+        startService(widgetUpdate);
     }
 
     protected void onDestroy(){
@@ -412,6 +419,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     mUpdateBtnProgress.setVisibility(View.VISIBLE);
                     queryWeatherCode(cityCode);
                     startService();
+                    updateWidgetService(cityCode);
                 }else{
                     Log.d("myWeather","网络挂了");
                     ToastUtil.showToast(MainActivity.this,"网络挂了！");
@@ -995,6 +1003,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     editor.commit();
                     queryWeatherCode(newCityCode);
                     startService();
+                    updateWidgetService(newCityCode);
                 }
             }else{
                 Log.d("myWeather","网络挂了");

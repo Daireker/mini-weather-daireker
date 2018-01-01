@@ -55,6 +55,10 @@
             android:enabled="true"
             android:exported="true"></service>
         <service
+            android:name="com.example.daireker.util.UpdateWidgetService"
+            android:enabled="true"
+            android:exported="true"></service>
+        <service
             android:name="com.baidu.location.f"
             android:enabled="true"
             android:process=":remote"></service>

@@ -32,7 +32,7 @@ public class MyService extends Service{
                 update.setAction("UPDATE_WEATHER");
                 sendBroadcast(update);
             }
-        },0,300 * 1000);
+        },0,6 * 300 * 1000);
         return super.onStartCommand(intent, flags, startId);
     }
 

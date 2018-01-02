@@ -2,8 +2,11 @@ package com.example.daireker.util;
 
 import android.app.Service;
 import android.appwidget.AppWidgetManager;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
@@ -25,6 +28,7 @@ import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Calendar;
 
 /**
  * Created by daireker on 2018/1/2.
@@ -67,13 +71,31 @@ public class UpdateWidgetService extends Service{
         if(citycode != null){
             queryWeatherCode(citycode);
         }
+        IntentFilter updateIntent = new IntentFilter();
+        updateIntent.addAction("android.intent.action.TIME_TICK");
+        registerReceiver(broadcastReceiver, updateIntent);
         return super.onStartCommand(intent, flags, startId);
     }
 
     @Override
     public void onDestroy() {
+        unregisterReceiver(broadcastReceiver);
+        Intent intent = new Intent(getApplicationContext(), UpdateWidgetService.class);
+        getApplication().startService(intent);
         super.onDestroy();
     }
+
+    private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Calendar calendar = Calendar.getInstance();
+            int min = calendar.get(Calendar.MINUTE);
+            if(min == 0 || min == 30){
+                queryWeatherCode(citycode);
+                Log.d("widget","widget已更新！");
+            }
+        }
+    };
 
     private void initWidget(){
         remoteViews = new RemoteViews(getPackageName(), R.layout.weather_widget);

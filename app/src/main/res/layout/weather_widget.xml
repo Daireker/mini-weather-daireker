@@ -2,7 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#919191"
+    android:background="#50919191"
     android:padding="8dp">
 
     <LinearLayout
@@ -10,8 +10,7 @@
         android:layout_height="80dp"
         android:layout_centerVertical="true"
         android:layout_centerHorizontal="true"
-        android:orientation="horizontal"
-        android:background="#919191">
+        android:orientation="horizontal">
 
         <LinearLayout
             android:layout_width="120dp"
@@ -23,7 +22,6 @@
                 android:layout_width="120dp"
                 android:layout_height="40dp"
                 android:gravity="left|center_vertical"
-                android:background="#919191"
                 android:text="N/A"
                 android:textColor="@android:color/white"
                 android:textSize="20dp" />
@@ -33,7 +31,6 @@
                 android:layout_width="120dp"
                 android:layout_height="40dp"
                 android:gravity="left|center_vertical"
-                android:background="#919191"
                 android:text="N/A"
                 android:textColor="@android:color/white"
                 android:textSize="20dp" />
@@ -62,7 +59,6 @@
                 android:layout_width="120dp"
                 android:layout_height="40dp"
                 android:gravity="right|center_vertical"
-                android:background="#919191"
                 android:text="N/A"
                 android:textColor="@android:color/white"
                 android:textSize="20dp" />
@@ -72,7 +68,6 @@
                 android:layout_width="120dp"
                 android:layout_height="40dp"
                 android:gravity="right|center_vertical"
-                android:background="#919191"
                 android:text="N/A"
                 android:textColor="@android:color/white"
                 android:textSize="20dp" />
